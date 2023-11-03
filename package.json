@@ -9,12 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "clsx": "^2.0.0",
+    "follow-redirects": "^1.15.3",
     "next": "14.0.1",
     "papaparse": "^5.4.1",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/download": "^8.0.4",
+    "@types/follow-redirects": "^1.14.3",
     "@types/node": "^20",
     "@types/papaparse": "^5.3.10",
     "@types/react": "^18",
