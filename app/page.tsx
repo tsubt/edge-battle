@@ -23,6 +23,8 @@ export default function Home() {
       </div>
 
       <Results />
+
+      <p className="mt-24">Score is 100 &times; edging time / penalty.</p>
     </main>
   );
 }
@@ -39,10 +41,8 @@ const Results = async () => {
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-2 gap-24 mt-6 items-center justify-evenly text-6xl font-bold text-red-500">
-        <div className="text-right ">
-          {Math.round(achilles.score * 100) / 100}
-        </div>
-        <div className="">{Math.round(tom.score * 100) / 100}</div>
+        <div className="text-right ">{Math.round(achilles.score * 100)}</div>
+        <div className="">{Math.round(tom.score * 100)}</div>
       </div>
 
       <div className="grid grid-cols-2 gap-24 items-center justify-evenly text-3xl font-bold">
@@ -52,12 +52,11 @@ const Results = async () => {
 
       <div className="grid grid-cols-2 gap-24 items-center justify-evenly text-3xl font-bold">
         <div className="text-right flex gap-2 items-center justify-end text-black">
-          {achilles.data
-            .map((d) => d.releases)
-            .flat()
-            .map((r, i) => (
-              <Release key={i} release={r} />
-            ))}
+          {achilles.data.map((d) =>
+            d.releases.map((r, i) => (
+              <Release key={i} release={r} cum={d.eatCum} />
+            ))
+          )}
         </div>
         <div className="text-right flex gap-2 items-center justify-start text-black">
           {tom.data.map((d) =>
