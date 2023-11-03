@@ -3,16 +3,6 @@ import Header from "./components/Header";
 import { getData } from "./data/getData";
 import { penaltyMap } from "./data/getData";
 
-// async function getData() {
-//   const res = await fetch("http://localhost:3000/data");
-//   console.log(res);
-//   if (!res.ok) {
-//     throw new Error("Failed to get data");
-//   }
-//   // console.log(res.json());
-//   // return res.json();
-// }
-
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center p-24 text-white bg-gradient-to-b from-black to-orange-950">
