@@ -161,12 +161,12 @@ export async function getData() {
         .map((v) => v.sessionLength)
         .reduce((total, current) => total + current, 0),
       penalty: val
-        .map(
-          (v) =>
-            v.releases
-              .map((r) => penaltyMap.get(r) || 0)
-              .reduce((total, current) => total + current, 0) *
-            (v.eatCum ? 1 : 2)
+        .map((v) =>
+          v.releases
+            .map(
+              (r) => (penaltyMap.get(r) || 0) * (v.eatCum ? 1 : noCumScore(r))
+            )
+            .reduce((total, current) => total + current, 0)
         )
         .flat()
         .reduce((total, current) => total + current, 0),
@@ -189,3 +189,8 @@ export const penaltyMap = new Map<string, number>([
   ["Anal", -20],
   ["Tapping", -1],
 ]);
+
+const noCumScore = (penalty: string) => {
+  if (penalty === "Anal" || penalty === "Tapping") return 0.5;
+  return 2;
+};
