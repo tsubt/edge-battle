@@ -196,4 +196,4 @@ const noCumScore = (penalty: string) => {
   return 2;
 };
 
-export const revalidate = 3600; // revalidate the data at most every hour
+export const revalidate = 60; // revalidate the data at most every hour
