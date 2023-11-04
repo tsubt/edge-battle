@@ -26,7 +26,8 @@ export default function Home() {
           Edgees will supply this before a session.
         </p>
         <p>
-          The panalty for release ("orgasm") depends on the type (see below).
+          The panalty for release (&ldquo;orgasm&rdquo;) depends on the type
+          (see below).
         </p>
         <p>
           Not eating all of the cum results in a &times;2 multiplier to the
