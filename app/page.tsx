@@ -40,7 +40,7 @@ export default function Home() {
       <div className="grid grid-cols-4 md:grid-cols-7 gap-6 items-center flex-wrap mt-4">
         {Array.from(penaltyMap).map(([key, value]) => (
           <div key={key} className="flex flex-col gap-1 text-xs items-center">
-            <Release release={key} cum={true} />
+            <Release release={key} cum={true} hover={false} />
             {key}
           </div>
         ))}
@@ -96,7 +96,7 @@ const Results = async () => {
         <div className="text-right w-full flex gap-2 items-center justify-end text-black flex-wrap">
           {achilles.data.map((d) =>
             d.releases.map((r, i) => (
-              <Release key={i} release={r} cum={d.eatCum} />
+              <Release key={i} release={r} cum={d.eatCum} hover={true} />
             ))
           )}
         </div>
@@ -106,7 +106,7 @@ const Results = async () => {
         <div className="text-right w-full flex gap-2 items-center justify-start text-black flex-wrap">
           {tom.data.map((d) =>
             d.releases.map((r, i) => (
-              <Release key={i} release={r} cum={d.eatCum} />
+              <Release key={i} release={r} cum={d.eatCum} hover={true} />
             ))
           )}
         </div>
@@ -115,13 +115,21 @@ const Results = async () => {
   );
 };
 
-const Release = ({ release, cum }: { release: string; cum: boolean }) => {
+const Release = ({
+  release,
+  cum,
+  hover,
+}: {
+  release: string;
+  cum: boolean;
+  hover: boolean;
+}) => {
   const penalty = penaltyMap.get(release) || 0;
   const noEatPenalty = penalty > 0 ? 2 : 0.5;
   return (
     <div
       className={twMerge(
-        "h-5 w-5 rounded bg-white text-[0.5rem] flex items-center justify-center text-black font-bold",
+        "h-5 w-5 rounded bg-white text-[0.5rem] flex items-center justify-center text-black font-bold relative group cursor-pointer",
         release === "Full" && "bg-red-100",
         release === "Ruined" && "bg-orange-100",
         release === "Handsfree" && "bg-green-100",
@@ -134,6 +142,12 @@ const Release = ({ release, cum }: { release: string; cum: boolean }) => {
     >
       {penalty > 0 && "+"}
       {penalty * (cum ? 1 : noEatPenalty)}
+      {/* {hover && (
+        <div className="absolute top-full translate-y-1 left-1/2 -translate-x-1/2 text-white w-auto whitespace-nowrap bg-black hidden group-hover:flex flex-col text-left px-3 py-1 gap-0">
+          <div>Orgasm type: {release}</div>
+          <div>Cum {!cum && "not"} eaten</div>
+        </div>
+      )} */}
     </div>
   );
 };

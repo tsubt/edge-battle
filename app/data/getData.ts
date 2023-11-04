@@ -1,5 +1,6 @@
 import { https } from "follow-redirects";
 import { createWriteStream, createReadStream } from "fs";
+import { cache } from "react";
 
 import Papa from "papaparse";
 import { z } from "zod";
@@ -74,7 +75,7 @@ function groupBy<K, V>(array: V[], grouper: (item: V) => K) {
   }, new Map<K, V[]>());
 }
 
-export async function getData() {
+export const getData = cache(async () => {
   const url = process.env.DATA_URL;
   if (!url) {
     return;
@@ -178,7 +179,7 @@ export async function getData() {
     .sort((a, b) => a.boy.localeCompare(b.boy));
 
   return battle;
-}
+});
 
 export const penaltyMap = new Map<string, number>([
   ["Full", 10],
@@ -194,3 +195,5 @@ const noCumScore = (penalty: string) => {
   if (penalty === "Anal" || penalty === "Tapping") return 0.5;
   return 2;
 };
+
+export const revalidate = 3600; // revalidate the data at most every hour
