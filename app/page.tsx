@@ -1,7 +1,7 @@
-import clsx from "clsx";
 import Header from "./components/Header";
 import { getData } from "./data/getData";
 import { penaltyMap } from "./data/getData";
+import { twMerge } from "tailwind-merge";
 
 export default function Home() {
   return (
@@ -63,7 +63,7 @@ const Results = async () => {
 const Release = ({ release, cum }: { release: string; cum: boolean }) => {
   return (
     <div
-      className={clsx(
+      className={twMerge(
         "h-5 w-5 rounded-full bg-white text-xs flex items-center justify-center",
         release === "Full" && "bg-red-600 text-white",
         release === "Ruined" && "bg-orange-600",
