@@ -81,28 +81,34 @@ export const getData = cache(async () => {
     return;
     // return NextResponse.json(
     //   { error: "Internal server error" },
-    //   { status: 500 }
+    //   { status: 500 }f
     // );
   }
 
-  await new Promise<void>((resolve) => {
-    https.get(url, (res) => {
-      const fileStream = createWriteStream("data.csv");
-      res.pipe(fileStream);
+  const data = await fetch(url, { next: { revalidate: 60 } });
+  if (!data.ok) return;
 
-      fileStream.on("finish", () => {
-        fileStream.close();
-        console.log("Download finished");
-        resolve();
-      });
-    });
-  });
+  const csvData = await data.text();
 
-  const file = createReadStream("data.csv");
+  // await new Promise<void>((resolve) => {
+  //   https.get(url, (res) => {
+  //     const fileStream = createWriteStream("data.csv");
+  //     res.pipe(fileStream);
+
+  //     fileStream.on("finish", () => {
+  //       fileStream.close();
+  //       console.log("Download finished");
+  //       resolve();
+  //     });
+  //   });
+  // });
+
+  // const file = createReadStream("data.csv");
+  // console.log(file);
 
   //   parse with papaparse
   const res = await new Promise<ResponseType>((resolve) =>
-    Papa.parse(file, {
+    Papa.parse(csvData, {
       header: true,
       complete: (results) => {
         const data = results.data as { [key: string]: string }[];
@@ -143,7 +149,7 @@ export const getData = cache(async () => {
             timestamp: new Date(timestamp),
             sessionLength: parseInt(sessionLength),
             ...rest,
-            eatCum: eatCum === "Yes",
+            eatCum: eatCum !== "",
             releases: releases.flat(),
           };
         });
@@ -184,16 +190,14 @@ export const getData = cache(async () => {
 export const penaltyMap = new Map<string, number>([
   ["Full", 10],
   ["Ruined", 5],
-  ["Handsfree", 0],
   ["BallBusting", 4],
   ["Nipple", 2],
-  ["Anal", -20],
+  ["Handsfree", 0],
   ["Tapping", -1],
+  ["Anal", -20],
 ]);
 
 const noCumScore = (penalty: string) => {
   if (penalty === "Anal" || penalty === "Tapping") return 0.5;
   return 2;
 };
-
-export const revalidate = 60; // revalidate the data at most every hour

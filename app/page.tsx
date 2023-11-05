@@ -58,9 +58,18 @@ const Results = async () => {
 
   if (!achilles || !tom) return <>No data ...</>;
 
+  // catch up
+  const achillesScore = achilles.score,
+    tomScore = tom.score;
+
+  const ahead = achillesScore > tomScore ? "Achilles" : "Tom";
+  const diff = Math.abs(achillesScore - tomScore);
+  const tNeeded =
+    diff * (ahead === "Achilles" ? tom.penalty : achilles.penalty);
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-3 mt-6 items-center justify-evenly text-6xl font-bold text-red-500 w-[600px] justify-items-center">
+      <div className="grid grid-cols-3 mt-6 items-center justify-evenly text-6xl font-bold text-red-500 w-[600px] justify-items-center w-full">
         <div className="text-right w-full">
           {Math.round(achilles.score * 100)}
         </div>
@@ -78,6 +87,26 @@ const Results = async () => {
         <div className="w-full">{tom.totalTime}</div>
       </div>
 
+      <div className="grid grid-cols-3 justify-items-center items-center justify-evenly text-3xl font-bold -mt-6">
+        <div className="text-right w-full flex gap-1 items-center justify-end flex-wrap text-xs text-orange-400 font-normal">
+          {achilles.data.map((d, i) => (
+            <div key={i}>
+              {i > 0 && "+ "}
+              {d.sessionLength}
+            </div>
+          ))}
+        </div>
+        <div className="text-sm font-normal whitespace-nowrap text-center w-36"></div>
+        <div className="text-right w-full flex gap-1 items-center justify-end flex-wrap text-xs text-orange-400 font-normal">
+          {tom.data.map((d, i) => (
+            <div key={i}>
+              {i > 0 && "+ "}
+              {d.sessionLength}
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 justify-items-center items-center justify-evenly text-3xl font-bold">
         <div className="text-right w-full">
           {achilles.data
@@ -85,7 +114,7 @@ const Results = async () => {
             .reduce((x, c) => x + c, 0)}
         </div>
         <div className="text-sm font-normal whitespace-nowrap text-center w-36">
-          orgasms/releases
+          releases (&ldquo;orgasms&rdquo;)
         </div>
         <div className="w-full">
           {tom.data.map((d) => d.releases.length).reduce((x, c) => x + c, 0)}
@@ -93,6 +122,14 @@ const Results = async () => {
       </div>
 
       <div className="grid grid-cols-3 justify-items-center items-center justify-evenly text-3xl font-bold">
+        <div className="text-right w-full">{achilles.penalty}</div>
+        <div className="text-sm font-normal whitespace-nowrap text-center w-36">
+          penalty
+        </div>
+        <div className="w-full">{tom.penalty}</div>
+      </div>
+
+      <div className="grid grid-cols-3 justify-items-center items-center justify-evenly text-3xl font-bold -mt-5">
         <div className="text-right w-full flex gap-2 items-center justify-end text-black flex-wrap">
           {achilles.data.map((d) =>
             d.releases.map((r, i) => (
@@ -100,9 +137,7 @@ const Results = async () => {
             ))
           )}
         </div>
-        <div className="text-sm font-normal whitespace-nowrap text-center w-36">
-          penalties
-        </div>
+        <div className="text-sm font-normal whitespace-nowrap text-center w-36"></div>
         <div className="text-right w-full flex gap-2 items-center justify-start text-black flex-wrap">
           {tom.data.map((d) =>
             d.releases.map((r, i) => (
@@ -110,6 +145,11 @@ const Results = async () => {
             ))
           )}
         </div>
+      </div>
+
+      <div className="flex justify-center font-bold text-green-400 mt-6">
+        {ahead === "Achilles" ? "Tom" : "Achilles"} needs to edge (without
+        release) for {Math.ceil(tNeeded)} minutes to overtake {ahead}.
       </div>
     </div>
   );
