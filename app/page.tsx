@@ -1,7 +1,106 @@
 import Header from "./components/Header";
-import { getData } from "./data/getData";
-import { penaltyMap } from "./data/getData";
+import {
+  ResponseType,
+  Result,
+  columnNames,
+  groupBy,
+  noCumScore,
+  penaltyMap,
+} from "./data/getData";
 import { twMerge } from "tailwind-merge";
+import Papa from "papaparse";
+
+const getData = async () => {
+  const url = process.env.DATA_URL;
+  if (!url) {
+    return;
+  }
+
+  const data = await fetch(url, { next: { revalidate: 60 } });
+  if (!data.ok) return;
+
+  const csvData = await data.text();
+
+  //   parse with papaparse
+  const res = await new Promise<ResponseType>((resolve) =>
+    Papa.parse(csvData, {
+      header: true,
+      complete: (results) => {
+        const data = results.data as { [key: string]: string }[];
+        const d = data.map((d) => {
+          let x = Object.keys(d).map((key) => {
+            const newKey = columnNames[key] || key;
+            return { [newKey]: d[key] };
+          });
+          x = Object.assign({}, ...x);
+          const {
+            timestamp,
+            sessionLength,
+            nRuined,
+            nFull,
+            releaseHandsfree,
+            releaseRuined,
+            releaseFull,
+            releaseBallBusting,
+            releaseAnal,
+            releaseNipple,
+            releaseTapping,
+            eatCum,
+            eatCum2,
+            ...rest
+          } = Result.parse(x);
+          const releases = [
+            { type: "Full", n: parseInt(releaseFull) },
+            { type: "Ruined", n: parseInt(releaseRuined) },
+            { type: "Handsfree", n: parseInt(releaseHandsfree) },
+            { type: "BallBusting", n: parseInt(releaseBallBusting) },
+            { type: "Anal", n: parseInt(releaseAnal) },
+            { type: "Nipple", n: parseInt(releaseNipple) },
+            { type: "Tapping", n: parseInt(releaseTapping) },
+          ]
+            .filter((r) => r.n > 0)
+            .map((r) => Array(r.n).fill(r.type) as string[]);
+          return {
+            timestamp: new Date(timestamp),
+            sessionLength: parseInt(sessionLength),
+            ...rest,
+            eatCum: eatCum !== "",
+            releases: releases.flat(),
+          };
+        });
+
+        resolve(d);
+      },
+    })
+  );
+
+  // group into contestants
+  const battle = Array.from(groupBy(res, (x) => x.boy))
+    .map(([key, val]) => ({
+      boy: key,
+      data: val,
+      totalTime: val
+        .map((v) => v.sessionLength)
+        .reduce((total, current) => total + current, 0),
+      penalty: val
+        .map((v) =>
+          v.releases
+            .map(
+              (r) => (penaltyMap.get(r) || 0) * (v.eatCum ? 1 : noCumScore(r))
+            )
+            .reduce((total, current) => total + current, 0)
+        )
+        .flat()
+        .reduce((total, current) => total + current, 0),
+    }))
+    .map((x) => ({
+      ...x,
+      score: x.totalTime / x.penalty,
+    }))
+    .sort((a, b) => a.boy.localeCompare(b.boy));
+
+  return battle;
+};
 
 export default function Home() {
   return (
